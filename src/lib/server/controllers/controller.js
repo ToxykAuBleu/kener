@@ -30,6 +30,7 @@ import getSMTPTransport from "../notification/smtps.js";
 import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
+import Cron from "croner";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -798,11 +799,23 @@ export const CreateIncident = async (data) => {
     message: `${incident.incident_type} Created`,
     ...incident,
   });
+
+  if (incident.maintenance_strategy === "RECURRING") {
+    const start_date_time = Math.floor(new Cron(incident.cron, { paused: true }).nextRun().getTime() / 1000);
+    const end_date_time = start_date_time + incident.maintenance_duration * 60;
+    await db.createMaintenanceRecurrence({
+      incident_id: newIncident.id,
+      start_date_time,
+      end_date_time,
+    })
+  }
+
   return {
     incident_id: newIncident.id,
   };
 };
 
+// TODO: update maintenance recurrence.
 export const UpdateIncident = async (incident_id, data) => {
   let incidentExists = await db.getIncidentById(incident_id);
 

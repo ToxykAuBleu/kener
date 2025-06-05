@@ -4,10 +4,6 @@
  */
 export function up(knex) {
   return new Promise(async (resolve) => {
-    await knex("site_data")
-      .where("key", "colors")
-      .update({ value: knex.jsonInsert("value", "$.MAINTENANCE", "#6699cc") });
-
     // Due to alter() limitations on columns (specialy with SQlite and Amazon Redshift),
     // we recreate the entire table with new modifications.
     await knex.schema.createTable("incidents_temp", (table) => {
@@ -48,6 +44,14 @@ export function up(knex) {
     await knex.schema.dropTable("incidents");
     await knex.schema.renameTable("incidents_temp", "incidents");
 
+    await knex.schema.createTable("maintenances_recurrence", (table) => {
+      table.increments("id").primary();
+      table.integer("incident_id").notNullable();
+      table.integer("start_date_time").notNullable();
+      table.integer("end_date_time").notNullable();
+      table.boolean("done").defaultTo(false).notNullable();
+    });
+
     resolve();
   });
 }
@@ -58,10 +62,6 @@ export function up(knex) {
  */
 export function down(knex) {
   return new Promise(async (resolve) => {
-    await knex("site_data")
-      .where("key", "colors")
-      .update({ value: knex.jsonRemove("value", "$.MAINTENANCE") });
-
     await knex.schema.createTable("incidents_temp", (table) => {
       table.increments("id").primary();
       table.string("title", 255).notNullable();
@@ -93,6 +93,8 @@ export function down(knex) {
     // Deleting old table and renaming new one.
     await knex.schema.dropTable("incidents");
     await knex.schema.renameTable("incidents_temp", "incidents");
+
+    await knex.schema.dropTable("maintenances_recurrence");
     resolve();
   });
 }

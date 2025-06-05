@@ -1278,6 +1278,14 @@ class DbImpl {
   async deleteSubscriptionTriggerById(id) {
     return await this.knex("subscription_triggers").where({ id }).del();
   }
+
+  async createMaintenanceRecurrence(data) {
+    return await this.knex("maintenances_recurrence").insert({
+      incident_id: data.incident_id,
+      start_date_time: data.start_date_time,
+      end_date_time: data.end_date_time,
+    });
+  }
 }
 
 export default DbImpl;
