@@ -822,6 +822,9 @@ export const UpdateIncident = async (incident_id, data) => {
     status: data.status || incidentExists.status,
     state: data.state || incidentExists.state,
     end_date_time: data.end_date_time || incidentExists.end_date_time,
+    maintenance_strategy: data.maintenance_strategy || incidentExists.maintenance_strategy,
+    cron: data.cron || incidentExists.cron,
+    maintenance_duration: data.maintenance_duration || incidentExists.maintenance_duration,
   };
 
   //check if updateObject same as incidentExists
@@ -834,6 +837,9 @@ export const UpdateIncident = async (incident_id, data) => {
       status: incidentExists.status,
       state: incidentExists.state,
       end_date_time: incidentExists.end_date_time,
+      maintenance_strategy: incidentExists.maintenance_strategy,
+      cron: incidentExists.cron,
+      maintenance_duration: incidentExists.maintenance_duration,
     })
   ) {
     PushDataToQueue(incident_id, "updateIncident", {

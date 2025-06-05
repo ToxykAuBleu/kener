@@ -768,6 +768,9 @@ class DbImpl {
       status: data.status,
       state: data.state,
       updated_at: this.knex.fn.now(),
+      maintenance_strategy: data.maintenance_strategy,
+      cron: data.cron,
+      maintenance_duration: data.maintenance_duration,
     });
   }
 
