@@ -870,6 +870,27 @@ class DbImpl {
       .andWhere("i.end_date_time", ">=", timestamp)
       .andWhere("i.status", "OPEN")
       .andWhere("i.incident_type", "MAINTENANCE")
+      .andWhere("i.maintenance_strategy", "SINGLE")
+      .andWhere("i.state", "=", "RESOLVED")
+      .andWhere("i.incident_source", "!=", "ALERT");
+  }
+
+  async getRecurrentMaintenancesByMonitorTagRealtime(monitor_tag, timestamp) {
+    return await this.knex("incidents as i")
+      .select(
+        "i.id as id",
+        "mr.start_date_time as start_date_time",
+        "mr.end_date_time as end_date_time",
+        "im.monitor_impact",
+      )
+      .innerJoin("incident_monitors as im", "i.id", "im.incident_id")
+      .innerJoin("maintenances_recurrence as mr", "i.id", "mr.incident_id")
+      .where("im.monitor_tag", monitor_tag)
+      .andWhere("mr.start_date_time", "<=", timestamp)
+      .andWhere("mr.end_date_time", ">=", timestamp)
+      .andWhere("i.status", "OPEN")
+      .andWhere("i.incident_type", "MAINTENANCE")
+      .andWhere("i.maintenance_strategy", "RECURRING")
       .andWhere("i.state", "=", "RESOLVED")
       .andWhere("i.incident_source", "!=", "ALERT");
   }

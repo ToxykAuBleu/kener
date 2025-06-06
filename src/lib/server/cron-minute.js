@@ -31,8 +31,9 @@ async function manualIncident(monitor) {
   let startTs = GetMinuteStartNowTimestampUTC();
   let incidentArr = await db.getIncidentsByMonitorTagRealtime(monitor.tag, startTs);
   let maintenanceArr = await db.getMaintenanceByMonitorTagRealtime(monitor.tag, startTs);
+  let recurrentArr = await db.getRecurrentMaintenancesByMonitorTagRealtime(monitor.tag, startTs);
 
-  let impactArr = incidentArr.concat(maintenanceArr);
+  let impactArr = incidentArr.concat(maintenanceArr, recurrentArr);
 
   let impact = "";
   if (impactArr.length == 0) {
