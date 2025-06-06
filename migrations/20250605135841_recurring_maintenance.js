@@ -17,7 +17,8 @@ export function up(knex) {
       table.string("state", 255).defaultTo("INVESTIGATING");
       table.text("incident_type").defaultTo("INCIDENT");
       table.text("incident_source").defaultTo("DASHBOARD");
-      table.text("maintenance_strategy").nullable();
+      table.string("maintenance_strategy", 255).nullable();
+      table.string("timezone", 255).nullable();
       table.text("cron").nullable();
       table.integer("maintenance_duration").nullable();
     });

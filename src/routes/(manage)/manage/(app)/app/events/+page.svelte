@@ -37,6 +37,8 @@
 
   import * as Select from "$lib/components/ui/select";
   import { GetCronInterval, ValidateCronExpression } from "$lib/clientTools.js";
+  import AllTimezonesRaw from "$lib/all-timezones.json?raw";
+
   export let data;
   let status = "OPEN";
   let loadingData = false;
@@ -49,6 +51,7 @@
   let invalidFormMessage = "";
   let monitors = data.monitors;
   let formStateCreate = "idle";
+  const AllTimezones = JSON.parse(AllTimezonesRaw);
 
   async function fetchData() {
     loadingData = true;
@@ -110,6 +113,7 @@
       firstComment: "",
       incident_type: "INCIDENT",
       maintenance_strategy: "SINGLE",
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       cron: null
     };
   }
@@ -177,6 +181,7 @@
       id: newIncident.id,
       incident_type: newIncident.incident_type,
       maintenance_strategy: newIncident.maintenance_strategy,
+      timezone: newIncident.timezone,
       cron: newIncident.cron,
       maintenance_duration: newIncident.maintenance_duration
     };
@@ -224,6 +229,9 @@
 
     if (toPost.incident_type == "MAINTENANCE") {
       toPost.state = "RESOLVED";
+      if (toPost.timezone === "null") {
+        toPost.timezone = null;
+      }
     }
     toPost.incident_source = "DASHBOARD";
     formStateCreate = "loading";
@@ -873,7 +881,31 @@
                 </Select.Root>
               </div>
               {#if newIncident.maintenance_strategy == "RECURRING"}
-                <div class="col-span-1 col-start-1">
+                <div class="col-span-2">
+                  <Label class="mb-2 text-sm" for="timezone">
+                    <span class="capitalize">Timezone</span>
+                    <span class="text-red-500">*</span>
+                  </Label>
+                  <Select.Root portal={null} onSelectedChange={(e) => (newIncident.timezone = e.value)}>
+                    <Select.Trigger id="timezone">
+                      <Select.Value placeholder={newIncident.timezone} />
+                    </Select.Trigger>
+                    <Select.Content class="max-h-56 overflow-y-auto">
+                      <Select.Group>
+                        <Select.Label>Timezone</Select.Label>
+                        <Select.Item value="null" label="Same timezone as server" class="text-sm font-medium"
+                          >Same timezone as server</Select.Item
+                        >
+                        {#each AllTimezones as timezone}
+                          <Select.Item value={timezone.id} label={timezone.display_name} class="text-sm font-medium"
+                            >{timezone.display_name}</Select.Item
+                          >
+                        {/each}
+                      </Select.Group>
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+                <div class="col-span-1">
                   <Label for="cron" class="mb-2 text-sm">
                     Cron expression <span class="text-red-500">*</span>
                   </Label>

@@ -760,6 +760,7 @@ export const CreateIncident = async (data) => {
     incident_type: data.incident_type ?? "INCIDENT",
     incident_source: data.incident_source ?? "DASHBOARD",
     maintenance_strategy: data.maintenance_strategy ?? null,
+    timezone: data.timezone ?? null,
     cron: data.cron ?? null,
     maintenance_duration: data.maintenance_duration ?? null,
   };
@@ -801,7 +802,7 @@ export const CreateIncident = async (data) => {
   });
 
   if (incident.maintenance_strategy === "RECURRING") {
-    const start_date_time = Math.floor(new Cron(incident.cron, { paused: true }).nextRun().getTime() / 1000);
+    const start_date_time = Math.floor(new Cron(incident.cron, { paused: true, timezone: incident.timezone }).nextRun().getTime() / 1000);
     const end_date_time = start_date_time + incident.maintenance_duration * 60;
     await db.createMaintenanceRecurrence({
       incident_id: newIncident.id,

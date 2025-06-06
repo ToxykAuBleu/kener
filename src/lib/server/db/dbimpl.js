@@ -664,6 +664,7 @@ class DbImpl {
       incident_type: data.incident_type,
       incident_source: data.incident_source,
       maintenance_strategy: data.maintenance_strategy,
+      timezone: data.timezone,
       cron: data.cron,
       maintenance_duration: data.maintenance_duration,
     };
@@ -769,6 +770,7 @@ class DbImpl {
       state: data.state,
       updated_at: this.knex.fn.now(),
       maintenance_strategy: data.maintenance_strategy,
+      timezone: data.timezone,
       cron: data.cron,
       maintenance_duration: data.maintenance_duration,
     });
